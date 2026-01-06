@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Purchases - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>My Purchases</h1>
+            </div>
+            <a href="{{ url_for('buying') }}" class="back-link">← Back to Buying</a>
+        </header>
+        <main class="form-container">
+            <h2 style="margin-bottom: 32px;">Your Purchase History</h2>
+            
+            {% if purchases %}
+                {% for purchase in purchases %}
+                <div class="review-item" style="margin-bottom: 32px;">
+                    <div class="review-header" style="margin-bottom: 16px;">
+                        <div>
+                            <span class="reviewer-name" style="font-size: 1.1rem;">{{ purchase.item_details }}</span>
+                            <span style="color: #b3b3b3; font-size: 0.95rem; display: block; margin-top: 4px;">
+                                Purchased: {{ purchase.date[:10] }}
+                            </span>
+                        </div>
+                        <span class="review-rating" style="font-size: 1.1rem; font-weight: 600;">
+                            {% if purchase.status == 'pending' %}
+                                <span style="color: #fbbf24;">⏳ Pending Seller Approval</span>
+                            {% elif purchase.status == 'accepted' %}
+                                <span style="color: #22c55e;">✓ Accepted</span>
+                            {% elif purchase.status == 'declined' %}
+                                <span style="color: #ef4444;">✗ Declined</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <p style="color: #b3b3b3; margin-bottom: 4px;">Price: ${{ "%.2f"|format(purchase.price) }}</p>
+                        <p style="color: #b3b3b3; margin-bottom: 4px;">Lister: {{ purchase.lister_username }}</p>
+                        <p style="color: #b3b3b3; margin-bottom: 4px;">Seller: {{ purchase.seller_username }}</p>
+                    </div>
+
+                    {% if purchase.status == 'accepted' %}
+                    <div class="review-form" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 20px;">Leave a Review</h3>
+                        <form method="POST" action="{{ url_for('add_review') }}">
+                            <input type="hidden" name="purchase_id" value="{{ purchase.id }}">
+                            <input type="hidden" name="listing_id" value="{{ purchase.listing_id }}">
+                            
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-size: 0.95rem; margin-bottom: 8px;">Rating</label>
+                                <div class="stars" style="margin-bottom: 0;">
+                                    {% for i in range(1, 6) %}
+                                    <span class="star" onclick="setRating({{ purchase.id }}, {{ i }})" id="star-{{ purchase.id }}-{{ i }}">★</span>
+                                    {% endfor %}
+                                </div>
+                                <input type="hidden" name="rating" id="rating-{{ purchase.id }}" value="5" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-size: 0.95rem; margin-bottom: 8px;">Review</label>
+                                <textarea name="review_text" rows="4" placeholder="Share your experience with this purchase..." required style="padding: 10px; font-size: 0.95rem;"></textarea>
+                            </div>
+                            <button type="submit" style="padding: 10px 20px; font-size: 0.95rem; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border: none; border-radius: 8px; color: white; cursor: pointer;">Submit Review</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <p>No purchases yet. <a href="{{ url_for('buying') }}">Start shopping!</a></p>
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+    <script>
+        function setRating(purchaseId, rating) {
+            document.getElementById('rating-' + purchaseId).value = rating;
+            for (let i = 1; i <= 5; i++) {
+                const star = document.getElementById('star-' + purchaseId + '-' + i);
+                if (i <= rating) {
+                    star.style.color = '#fbbf24';
+                } else {
+                    star.style.color = '#666';
+                }
+            }
+        }
+        // Initialize stars
+        document.querySelectorAll('[id^="rating-"]').forEach(input => {
+            const rating = parseInt(input.value);
+            const purchaseId = input.id.split('-')[1];
+            for (let i = 1; i <= rating; i++) {
+                const star = document.getElementById('star-' + purchaseId + '-' + i);
+                if (star) star.style.color = '#fbbf24';
+            }
+        });
+    </script>
+</body>
+</html>
+

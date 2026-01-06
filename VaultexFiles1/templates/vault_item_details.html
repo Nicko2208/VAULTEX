@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Item Details</h1>
+            </div>
+            <a href="{{ url_for('vault') }}" class="back-link">← Back to The Vault</a>
+        </header>
+        
+        <main class="form-container">
+            <div class="original-item">
+                <h2 style="margin-bottom: 24px;">Item Information</h2>
+                <div class="original-item-content">
+                    <div class="item-image" style="max-width: 300px;">
+                        {% if item.photo_path and item.photo_path != 'images/placeholder.svg' %}
+                        <img src="{{ url_for('static', filename=item.photo_path) }}" alt="Item image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                        {% else %}
+                        <div class="placeholder">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="original-details">
+                        <p><strong>Details:</strong></p>
+                        <p>{{ item.brief_details }}</p>
+                        {% if item.seller_username %}
+                        <p><strong>Seller:</strong> {{ item.seller_username }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if session.user_id %}
+            <div style="text-align: center; margin: 32px 0;">
+                <a href="{{ url_for('list_item', item_id=item.id) }}" class="btn btn-primary">List This Item</a>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 48px;">
+                <h2 style="margin-bottom: 24px;">Linked Listings ({{ linked_listings|length }})</h2>
+                
+                {% if linked_listings %}
+                <div class="items-grid" style="margin-top: 24px;">
+                    {% for listing in linked_listings %}
+                    <div class="item-card buying-card">
+                        <div class="item-image">
+                            {% if listing.photo_path and listing.photo_path != 'images/placeholder.svg' %}
+                            <img src="{{ url_for('static', filename=listing.photo_path) }}" alt="Listing image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                            {% else %}
+                            <div class="placeholder">No Image</div>
+                            {% endif %}
+                        </div>
+                        <div class="item-details">
+                            <p class="item-description"><strong>Pitch:</strong> {{ listing.pitch_description }}</p>
+                            <div class="pricing-info">
+                                <p class="price">Price: ${{ "%.2f"|format(listing.listing_price) }}</p>
+                                <p class="commission">Commission: ${{ "%.2f"|format(listing.listing_price * listing.commission_percentage / 100) }} ({{ listing.commission_percentage }}%)</p>
+                            </div>
+                            {% if listing.lister_username %}
+                            <p style="font-size: 0.95rem; color: #b3b3b3; margin-top: 12px;">Listed by: {{ listing.lister_username }}</p>
+                            {% endif %}
+
+                            {% if listing.reviews %}
+                            <div class="reviews-section" style="margin-top: 20px;">
+                                <h3 style="font-size: 1.1rem; margin-bottom: 12px; color: #ffffff;">Reviews</h3>
+                                {% for review in listing.reviews[:3] %}
+                                <div class="review-item" style="margin-bottom: 12px; padding: 16px;">
+                                    <div class="review-header">
+                                        <span class="reviewer-name" style="font-size: 0.95rem;">{{ review.reviewer_username }}</span>
+                                        <span class="review-rating" style="font-size: 0.95rem;">★ {{ review.rating }}/5</span>
+                                    </div>
+                                    <p class="review-text" style="font-size: 0.9rem; margin: 8px 0 0 0;">{{ review.review_text }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <a href="{{ url_for('checkout', listing_id=listing.id) }}" class="btn" style="margin-top: 20px; display: inline-block;">Buy Now</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state" style="padding: 40px 20px;">
+                    <p>No listings yet for this item. {% if session.user_id %}<a href="{{ url_for('list_item', item_id=item.id) }}">Be the first to list it!</a>{% else %}<a href="{{ url_for('login') }}">Login to list this item</a>{% endif %}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>
+

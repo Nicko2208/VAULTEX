@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Login</h1>
+            </div>
+            <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+        </header>
+        <main class="form-container" style="max-width: 500px;">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 24px; color: #b3b3b3;">
+                Don't have an account? <a href="{{ url_for('register') }}" style="color: #dc2626;">Register here</a>
+            </p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>
+

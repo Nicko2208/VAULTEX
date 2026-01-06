@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Admin Login</h1>
+            </div>
+            <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+        </header>
+        <main class="form-container" style="max-width: 500px;">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="password">Admin Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>
+

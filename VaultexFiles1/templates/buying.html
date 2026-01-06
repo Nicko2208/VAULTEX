@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buying - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Buying</h1>
+            </div>
+            <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+        </header>
+        
+        <div class="filter-section" style="width: 100%; max-width: 1000px; margin: 0 auto 40px auto; background: rgba(255,255,255,0.03); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+            <form method="GET" action="{{ url_for('buying') }}" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 16px; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="search" style="font-size: 0.95rem;">Search</label>
+                    <input type="text" id="search" name="search" placeholder="Search items..." value="{{ request.args.get('search', '') }}" class="search-box" style="width: 100%; max-width: none;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="price_min" style="font-size: 0.95rem;">Min Price</label>
+                    <input type="number" id="price_min" name="price_min" placeholder="Min" step="0.01" value="{{ request.args.get('price_min', '') }}" style="padding: 12px 16px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; color: #ffffff; font-size: 1rem; width: 100%;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="price_max" style="font-size: 0.95rem;">Max Price</label>
+                    <input type="number" id="price_max" name="price_max" placeholder="Max" step="0.01" value="{{ request.args.get('price_max', '') }}" style="padding: 12px 16px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; color: #ffffff; font-size: 1rem; width: 100%;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="lister" style="font-size: 0.95rem;">Lister</label>
+                    <select id="lister" name="lister" style="padding: 12px 16px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; color: #ffffff; font-size: 1rem; width: 100%;">
+                        <option value="">All Listers</option>
+                        {% for lister in all_listers %}
+                        <option value="{{ lister }}" {% if request.args.get('lister') == lister %}selected{% endif %}>{{ lister }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 0; padding: 12px 24px;">Filter</button>
+            </form>
+            {% if request.args.get('search') or request.args.get('price_min') or request.args.get('price_max') or request.args.get('lister') %}
+            <a href="{{ url_for('buying') }}" style="display: inline-block; margin-top: 16px; color: #dc2626; text-decoration: none; font-size: 0.9rem;">Clear Filters</a>
+            {% endif %}
+        </div>
+
+        <main class="items-grid" id="itemsGrid">
+            {% for item in items %}
+            <div class="item-card buying-card">
+                <div class="item-image">
+                    {% if item.photo_path and item.photo_path != 'images/placeholder.svg' %}
+                    <img src="{{ url_for('static', filename=item.photo_path) }}" alt="Item image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                    {% else %}
+                    <div class="placeholder">No Image</div>
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <p class="item-description"><strong>Details:</strong> {{ item.brief_details }}</p>
+                    <div class="pitch-section">
+                        <p class="pitch-text"><strong>Pitch:</strong> {{ item.pitch_description }}</p>
+                    </div>
+                    <div class="pricing-info">
+                        <p class="price">Price: ${{ "%.2f"|format(item.listing_price) }}</p>
+                        <p class="commission">Commission: ${{ "%.2f"|format(item.listing_price * item.commission_percentage / 100) }} ({{ item.commission_percentage }}%)</p>
+                    </div>
+                    {% if item.lister_username %}
+                    <p style="font-size: 0.95rem; color: #b3b3b3; margin-top: 12px;">Listed by: {{ item.lister_username }}</p>
+                    {% endif %}
+
+                    {% if item.reviews %}
+                    <div class="reviews-section" style="margin-top: 20px;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 12px; color: #ffffff;">Reviews</h3>
+                        {% for review in item.reviews[:3] %}
+                        <div class="review-item" style="margin-bottom: 12px; padding: 16px;">
+                            <div class="review-header">
+                                <span class="reviewer-name" style="font-size: 0.95rem;">{{ review.reviewer_username }}</span>
+                                <span class="review-rating" style="font-size: 0.95rem;">★ {{ review.rating }}/5</span>
+                            </div>
+                            <p class="review-text" style="font-size: 0.9rem; margin: 8px 0 0 0;">{{ review.review_text }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if session.user_id %}
+                    <a href="{{ url_for('checkout', listing_id=item.id) }}" class="btn" style="margin-top: 20px; display: inline-block;">Buy Now</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn" style="margin-top: 20px; display: inline-block; background: rgba(255,255,255,0.1);">Login to Buy</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% if not items %}
+            <div class="empty-state">
+                <p>No items available. {% if session.user_id %}<a href="{{ url_for('vault') }}">Browse the Vault to list items!</a>{% else %}<a href="{{ url_for('login') }}">Login to get started</a>{% endif %}</p>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

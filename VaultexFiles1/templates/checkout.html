@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Checkout</h1>
+            </div>
+            <a href="{{ url_for('buying') }}" class="back-link">← Back to Buying</a>
+        </header>
+        <main class="form-container">
+            <div class="checkout-item">
+                <div class="item-image" style="width: 200px; height: 200px; margin: 0 auto 20px auto;">
+                    {% if listing.photo_path and listing.photo_path != 'images/placeholder.svg' %}
+                    <img src="{{ url_for('static', filename=listing.photo_path) }}" alt="Item image">
+                    {% else %}
+                    <div class="placeholder">No Image</div>
+                    {% endif %}
+                </div>
+                <h2 style="text-align: center; margin-bottom: 16px;">{{ listing.brief_details }}</h2>
+                <div class="pricing-info" style="text-align: center; margin-bottom: 32px;">
+                    <p class="price">Total: ${{ "%.2f"|format(listing.listing_price) }}</p>
+                    <p class="commission">Includes commission: ${{ "%.2f"|format(listing.listing_price * listing.commission_percentage / 100) }}</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('purchase', listing_id=listing.id) }}">
+                <div class="form-group">
+                    <label for="buyer_email">Email Address *</label>
+                    <input type="email" id="buyer_email" name="buyer_email" placeholder="your.email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="buyer_phone">Phone Number *</label>
+                    <input type="tel" id="buyer_phone" name="buyer_phone" placeholder="+1 (555) 123-4567" required>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin: 24px 0; border: 1px solid rgba(255,255,255,0.1);">
+                    <p style="color: #b3b3b3; font-size: 0.95rem; margin: 0; line-height: 1.6;">
+                        <strong style="color: #ffffff;">Note:</strong> By submitting this purchase request, you agree to purchase this item at the listed price. The seller will review your request and contact you if accepted. You will only be able to leave a review after your purchase is accepted. Your account information ({{ session.username }}) will be used for this purchase.
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Purchase Request</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>
+

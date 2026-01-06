@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Admin Dashboard</h1>
+            </div>
+            <div style="display: flex; gap: 16px; justify-content: center; margin-top: 20px;">
+                <a href="{{ url_for('admin_logout') }}" class="back-link">Logout</a>
+                <a href="{{ url_for('home') }}" class="back-link">← Home</a>
+                <a href="{{ url_for('vault') }}" class="back-link">View Vault</a>
+            </div>
+        </header>
+        <main class="form-container">
+            <h2 style="margin-bottom: 32px;">Vault Items</h2>
+            
+            {% if inventory %}
+            <div class="items-grid" style="margin-bottom: 48px;">
+                {% for item in inventory %}
+                <div class="item-card">
+                    <div class="item-image">
+                        {% if item.photo_path and item.photo_path != 'images/placeholder.svg' %}
+                        <img src="{{ url_for('static', filename=item.photo_path) }}" alt="Item image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                        {% else %}
+                        <div class="placeholder">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <p class="item-description">{{ item.brief_details }}</p>
+                        {% if item.seller_username %}
+                        <p style="font-size: 0.95rem; color: #b3b3b3; margin-top: 12px;">Seller: {{ item.seller_username }}</p>
+                        {% endif %}
+                        <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" style="margin-top: 16px;" onsubmit="return confirm('Are you sure you want to delete this item and all its connected listings?');">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); width: 100%;">Delete Item</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No items in the vault.</p>
+            </div>
+            {% endif %}
+
+            <h2 style="margin-bottom: 32px; margin-top: 48px;">Listings</h2>
+            
+            {% if listings %}
+            <div class="items-grid">
+                {% for listing in listings %}
+                <div class="item-card buying-card">
+                    <div class="item-image">
+                        {% if listing.photo_path and listing.photo_path != 'images/placeholder.svg' %}
+                        <img src="{{ url_for('static', filename=listing.photo_path) }}" alt="Listing image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                        {% else %}
+                        <div class="placeholder">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <p class="item-description"><strong>Details:</strong> {{ listing.brief_details }}</p>
+                        <p class="item-description"><strong>Pitch:</strong> {{ listing.pitch_description }}</p>
+                        <div class="pricing-info">
+                            <p class="price">Price: ${{ "%.2f"|format(listing.listing_price) }}</p>
+                            <p class="commission">Commission: {{ listing.commission_percentage }}%</p>
+                        </div>
+                        {% if listing.lister_username %}
+                        <p style="font-size: 0.95rem; color: #b3b3b3; margin-top: 12px;">Listed by: {{ listing.lister_username }}</p>
+                        {% endif %}
+                        <form method="POST" action="{{ url_for('delete_listing', listing_id=listing.id) }}" style="margin-top: 16px;" onsubmit="return confirm('Are you sure you want to delete this listing?');">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); width: 100%;">Delete Listing</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No listings yet.</p>
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>

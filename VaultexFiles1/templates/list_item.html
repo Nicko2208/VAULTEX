@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Item - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>List Item</h1>
+            </div>
+            <a href="{{ url_for('vault') }}" class="back-link">← Back to The Vault</a>
+        </header>
+        <main class="form-container">
+            <div class="original-item">
+                <h2>Original Item Details</h2>
+                <div class="original-item-content">
+                    <div class="item-image">
+                        {% if item.photo_path and item.photo_path != 'images/placeholder.svg' %}
+                        <img src="{{ url_for('static', filename=item.photo_path) }}" alt="Original item image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                        {% else %}
+                        <div class="placeholder">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="original-details">
+                        <p><strong>Original Details:</strong></p>
+                        <p>{{ item.brief_details }}</p>
+                        {% if item.seller_username %}
+                        <p><strong>Seller:</strong> {{ item.seller_username }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if item.seller_username and seller_reviews %}
+            <div class="reviews-section">
+                <h3>Seller Reviews</h3>
+                {% for review in seller_reviews %}
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="reviewer-name">{{ review.reviewer_username }}</span>
+                        <span class="review-rating">★ {{ review.rating }}/5</span>
+                    </div>
+                    <p class="review-text">{{ review.review_text }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('create_listing', item_id=item.id) }}">
+                <div class="form-group">
+                    <label for="pitch_description">
+                        Pitch Description
+                        {% if item.photo_path and item.photo_path != 'images/placeholder.svg' %}
+                        <button type="button" class="ai-generate-btn" onclick="generateAIPitch()">🤖 Generate AI Pitch</button>
+                        {% endif %}
+                        <span id="aiLoading" class="ai-loading" style="display:none;">Analyzing image...</span>
+                    </label>
+                    <textarea id="pitch_description" name="pitch_description" rows="6" placeholder="Write compelling selling points about this item. What makes it special? Why should someone buy it?" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="listing_price">Listing Price ($)</label>
+                    <input type="number" id="listing_price" name="listing_price" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label for="commission_percentage">Commission Percentage (%)</label>
+                    <input type="number" id="commission_percentage" name="commission_percentage" step="0.1" min="0" max="100" value="15.0" required>
+                    <small>You will earn this percentage of the listing price as commission</small>
+                </div>
+                <button type="submit" class="btn btn-primary">List Item to Buying Portal</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+    <script>
+        function generateAIPitch() {
+            const loadingEl = document.getElementById('aiLoading');
+            const textarea = document.getElementById('pitch_description');
+            loadingEl.style.display = 'inline';
+            
+            fetch('{{ url_for("generate_ai_pitch", item_id=item.id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingEl.style.display = 'none';
+                if (data.pitch) {
+                    textarea.value = data.pitch;
+                } else {
+                    alert('Could not generate pitch. Please try again or write manually.');
+                }
+            })
+            .catch(error => {
+                loadingEl.style.display = 'none';
+                console.error('Error:', error);
+                alert('Error generating AI pitch. Please write manually.');
+            });
+        }
+    </script>
+</body>
+</html>

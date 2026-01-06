@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Vault - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>The Vault</h1>
+            </div>
+            <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+        </header>
+        
+        <div class="filter-section" style="width: 100%; max-width: 900px; margin: 0 auto 40px auto; background: rgba(255,255,255,0.03); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+            <form method="GET" action="{{ url_for('vault') }}" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 16px; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="search" style="font-size: 0.95rem;">Search Items</label>
+                    <input type="text" id="search" name="search" placeholder="Search by description..." value="{{ request.args.get('search', '') }}" class="search-box" style="width: 100%; max-width: none;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="seller" style="font-size: 0.95rem;">Filter by Seller</label>
+                    <select id="seller" name="seller" style="padding: 12px 16px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; color: #ffffff; font-size: 1rem; width: 100%;">
+                        <option value="">All Sellers</option>
+                        {% for seller in all_sellers %}
+                        <option value="{{ seller }}" {% if request.args.get('seller') == seller %}selected{% endif %}>{{ seller }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 0; padding: 12px 24px;">Apply Filters</button>
+            </form>
+            {% if request.args.get('search') or request.args.get('seller') %}
+            <a href="{{ url_for('vault') }}" style="display: inline-block; margin-top: 16px; color: #dc2626; text-decoration: none; font-size: 0.9rem;">Clear Filters</a>
+            {% endif %}
+        </div>
+
+        <main class="items-grid" id="itemsGrid">
+            {% for item in items %}
+            <div class="item-card">
+                <div class="item-image" style="cursor: pointer;" onclick="window.location.href='{{ url_for('vault_item_details', item_id=item.id) }}'">
+                    {% if item.photo_path and item.photo_path != 'images/placeholder.svg' %}
+                    <img src="{{ url_for('static', filename=item.photo_path) }}" alt="Item image" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>Image Not Found</div>'">
+                    {% else %}
+                    <div class="placeholder">No Image</div>
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <p class="item-description" style="cursor: pointer;" onclick="window.location.href='{{ url_for('vault_item_details', item_id=item.id) }}'">{{ item.brief_details }}</p>
+                    {% if item.seller_username %}
+                    <p style="font-size: 0.95rem; color: #b3b3b3; margin-top: 12px;">Seller: {{ item.seller_username }}</p>
+                    {% endif %}
+                    {% if session.user_id %}
+                    <a href="{{ url_for('list_item', item_id=item.id) }}" class="btn">List Item</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn" style="background: rgba(255,255,255,0.1);">Login to List</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% if not items %}
+            <div class="empty-state">
+                <p>No items in the vault yet. {% if session.user_id %}<a href="{{ url_for('selling') }}">Upload the first item!</a>{% else %}<a href="{{ url_for('login') }}">Login to upload items</a>{% endif %}</p>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
+

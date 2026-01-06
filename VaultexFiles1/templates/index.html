@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaultex - Connect Sellers, Listers, and Buyers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Vaultex</h1>
+            </div>
+            <p class="subtitle">Connect Sellers, Listers, and Buyers</p>
+            {% if session.user_id %}
+            <div style="margin-top: 20px;">
+                <span style="color: #b3b3b3;">Logged in as: <strong style="color: #ffffff;">{{ session.username }}</strong></span>
+                <a href="{{ url_for('logout') }}" class="back-link" style="margin-left: 16px; padding: 6px 16px; font-size: 0.9rem;">Logout</a>
+            </div>
+            {% else %}
+            <div style="margin-top: 20px;">
+                <a href="{{ url_for('login') }}" class="back-link" style="margin-right: 12px;">Login</a>
+                <a href="{{ url_for('register') }}" class="back-link">Register</a>
+            </div>
+            {% endif %}
+        </header>
+        <main>
+            <div class="button-grid-main">
+                {% if session.user_id %}
+                <a href="{{ url_for('selling') }}" class="nav-button">
+                    <h2>Selling</h2>
+                    <p>Upload items to the vault</p>
+                </a>
+                {% else %}
+                <div class="nav-button" style="background: rgba(255,255,255,0.03); opacity: 0.7; cursor: not-allowed;">
+                    <h2>Selling</h2>
+                    <p><a href="{{ url_for('login') }}" style="color: #dc2626; text-decoration: none;">Login to upload items</a></p>
+                </div>
+                {% endif %}
+                <a href="{{ url_for('vault') }}" class="nav-button">
+                    <h2>The Vault</h2>
+                    <p>Browse all items in the universal vault</p>
+                </a>
+                <a href="{{ url_for('buying') }}" class="nav-button">
+                    <h2>Buying</h2>
+                    <p>Browse and purchase listed items</p>
+                </a>
+            </div>
+            {% if session.user_id %}
+            <div class="button-grid-secondary">
+                <a href="{{ url_for('seller_dashboard') }}" class="nav-button" style="background: rgba(255,255,255,0.05);">
+                    <h2>Seller Dashboard</h2>
+                    <p>Manage purchase requests</p>
+                </a>
+                <a href="{{ url_for('my_purchases') }}" class="nav-button" style="background: rgba(255,255,255,0.05);">
+                    <h2>My Purchases</h2>
+                    <p>View purchases and leave reviews</p>
+                </a>
+            </div>
+            {% endif %}
+            <div style="text-align: center; margin-top: 32px;">
+                <a href="{{ url_for('admin_login') }}" class="back-link" style="font-size: 0.95rem; padding: 8px 20px;">Admin Login</a>
+            </div>
+        </main>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <div class="faq-question">How does Vaultex work?</div>
+                <div class="faq-answer">
+                    Vaultex connects three types of users: Sellers upload items to the Vault (universal inventory), Listers create attractive listings with pricing, and Buyers browse and purchase items. Create an account to get started!
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">What is The Vault?</div>
+                <div class="faq-answer">
+                    The Vault is our universal inventory system. Anyone can browse it, and logged-in users can upload items. Once uploaded, items can be listed by any user to sell to buyers.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Do I need an account?</div>
+                <div class="faq-answer">
+                    You can browse The Vault and Buying pages without an account. However, to upload items, create listings, make purchases, or manage your seller dashboard, you'll need to create a free account.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">How do purchases work?</div>
+                <div class="faq-answer">
+                    When you find an item you want to buy, click "Buy Now" and submit a purchase request. The original seller will review your request and can accept or decline. Once accepted, you can leave a review.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Can I filter items?</div>
+                <div class="faq-answer">
+                    Yes! Both The Vault and Buying pages have powerful filter options. You can search by description, filter by seller/lister, and on the Buying page you can filter by price range as well.
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- Legal Section -->
+        <section class="legal-section">
+            <h2>Terms of Service & Legal Information</h2>
+            <div class="legal-text">
+                <p><strong>1. OWNERSHIP AND INTELLECTUAL PROPERTY:</strong> Vaultex ("Platform") is owned and operated by the Platform Owners. All content, design, logos, and functionality are proprietary and protected by copyright, trademark, and other intellectual property laws. Unauthorized use, reproduction, or distribution of any content is strictly prohibited.</p>
+                <p><strong>2. USER RESPONSIBILITIES:</strong> Users are solely responsible for the accuracy of all information provided, including item descriptions, pricing, and images. Users warrant that they have the legal right to sell, list, or purchase items through this Platform. Users are responsible for compliance with all applicable laws and regulations.</p>
+                <p><strong>3. PLATFORM LIABILITY DISCLAIMER:</strong> The Platform Owners act solely as an intermediary and are not responsible for the quality, safety, legality, or delivery of items. The Platform Owners disclaim all warranties, express or implied, including merchantability and fitness for a particular purpose. Users agree that the Platform Owners shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from use of this Platform.</p>
+                <p><strong>4. TRANSACTION DISPUTES:</strong> All transactions are between Sellers, Listers, and Buyers directly. The Platform Owners are not party to any transaction and assume no responsibility for disputes, refunds, or transaction issues. Users agree to resolve disputes directly with other parties involved.</p>
+                <p><strong>5. COMMISSION AND PAYMENT:</strong> Commission rates are set by Listers and clearly displayed. All payment processing occurs outside this Platform. The Platform Owners assume no responsibility for payment processing, escrow services, or financial transactions between users.</p>
+                <p><strong>6. PROHIBITED ACTIVITIES:</strong> Users may not engage in fraudulent activity, misrepresentation, spamming, or any illegal activities. The Platform Owners reserve the right to suspend or terminate accounts violating these terms without notice or refund.</p>
+                <p><strong>7. DATA AND PRIVACY:</strong> While we take reasonable measures to protect data, users acknowledge that no system is completely secure. Users grant the Platform Owners license to use, store, and display user-submitted content for Platform operation purposes.</p>
+                <p><strong>8. MODIFICATIONS TO TERMS:</strong> The Platform Owners reserve the right to modify these terms at any time. Continued use of the Platform constitutes acceptance of modified terms. Users are responsible for reviewing terms periodically.</p>
+                <p><strong>9. TERMINATION:</strong> The Platform Owners may suspend or terminate access to the Platform at any time, for any reason, without prior notice. Users may stop using the Platform at any time.</p>
+                <p><strong>10. GOVERNING LAW:</strong> These terms shall be governed by applicable law. Any disputes shall be resolved in the jurisdiction designated by the Platform Owners. Users waive any right to participate in class action lawsuits.</p>
+                <p><strong>11. INDEMNIFICATION:</strong> Users agree to indemnify, defend, and hold harmless the Platform Owners, their affiliates, officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from user's use of the Platform, violation of these terms, or violation of any rights of another party.</p>
+                <p><strong>12. NO WARRANTY:</strong> THE PLATFORM IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. THE PLATFORM OWNERS DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+                <p><strong>13. LIMITATION OF LIABILITY:</strong> TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE PLATFORM OWNERS' TOTAL LIABILITY FOR ANY CLAIMS SHALL NOT EXCEED THE AMOUNT PAID BY THE USER TO THE PLATFORM (IF ANY) IN THE TWELVE MONTHS PRECEDING THE CLAIM. IN NO EVENT SHALL THE PLATFORM OWNERS BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES.</p>
+                <p><strong>14. ACCEPTANCE:</strong> By using this Platform, users acknowledge they have read, understood, and agree to be bound by these Terms of Service. If you do not agree, you must discontinue use immediately.</p>
+                <p><strong>Last Updated:</strong> The date of last modification. Platform Owners reserve all rights not expressly granted herein.</p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

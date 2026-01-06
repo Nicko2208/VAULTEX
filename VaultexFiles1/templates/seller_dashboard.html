@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Seller Dashboard</h1>
+            </div>
+            <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+        </header>
+        <main class="form-container">
+            <h2 style="margin-bottom: 32px;">Your Purchase Requests</h2>
+            
+            {% if purchases %}
+                {% for purchase in purchases %}
+                <div class="review-item" style="margin-bottom: 24px;">
+                    <div class="review-header" style="margin-bottom: 16px;">
+                        <div>
+                            <span class="reviewer-name" style="font-size: 1.1rem;">{{ purchase.buyer_username }}</span>
+                            <span style="color: #b3b3b3; font-size: 0.95rem; display: block; margin-top: 4px;">
+                                {{ purchase.date[:10] }} at {{ purchase.date[11:16] }}
+                            </span>
+                        </div>
+                        <span class="review-rating" style="font-size: 1.1rem; font-weight: 600;">
+                            {% if purchase.status == 'pending' %}
+                                <span style="color: #fbbf24;">⏳ Pending</span>
+                            {% elif purchase.status == 'accepted' %}
+                                <span style="color: #22c55e;">✓ Accepted</span>
+                            {% elif purchase.status == 'declined' %}
+                                <span style="color: #ef4444;">✗ Declined</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <p style="color: #ffffff; font-weight: 600; margin-bottom: 8px;">Item: {{ purchase.item_details }}</p>
+                        <p style="color: #b3b3b3; margin-bottom: 4px;">Price: ${{ "%.2f"|format(purchase.price) }}</p>
+                        <p style="color: #b3b3b3; margin-bottom: 4px;">Buyer Email: {{ purchase.buyer_email }}</p>
+                        <p style="color: #b3b3b3; margin-bottom: 4px;">Buyer Phone: {{ purchase.buyer_phone }}</p>
+                    </div>
+                    {% if purchase.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('respond_purchase', purchase_id=purchase.id) }}" style="display: flex; gap: 12px;">
+                        <button type="submit" name="action" value="accept" class="btn" style="flex: 1; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">Accept</button>
+                        <button type="submit" name="action" value="decline" class="btn" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">Decline</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <p>No purchase requests yet. Items you sell will appear here when buyers make purchase requests!</p>
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selling - Vaultex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Vaultex Logo">
+                </div>
+                <h1>Selling</h1>
+            </div>
+            <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+        </header>
+        <main class="form-container">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="photo">Upload Photo</label>
+                    <input type="file" id="photo" name="photo" accept="image/*">
+                    <small>Accepted formats: PNG, JPG, JPEG, GIF, WEBP (max 16MB)</small>
+                    <div id="imagePreview" class="file-preview" style="display: none;">
+                        <img id="previewImg" src="" alt="Preview">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="brief_details">Brief Details</label>
+                    <textarea id="brief_details" name="brief_details" rows="5" placeholder="Enter a brief description of your item..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload to The Vault</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+    <script>
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

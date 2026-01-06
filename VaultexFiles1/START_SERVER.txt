@@ -1,0 +1,24 @@
+HOW TO START YOUR FLASK SERVER:
+================================
+
+Option 1: Double-click run_server.bat
+   - This will open a window and start the server
+   - Keep the window open while using the site
+   - Press Ctrl+C to stop it
+
+Option 2: Use Command Line
+   1. Open PowerShell or Command Prompt
+   2. Navigate to this folder: cd "C:\Users\Nick_\OneDrive\VaultexFiles"
+   3. Run: python app.py
+   4. Keep the terminal open while using the site
+
+Once the server is running, open your browser and go to:
+   http://localhost:5000
+   
+   OR
+   
+   http://127.0.0.1:5000
+
+The server must be running for the site to work!
+To stop the server, press Ctrl+C in the terminal window.
+
